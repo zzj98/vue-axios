@@ -1,0 +1,60 @@
+一:client2-axios
+
+    1.添加axios插件   npm install axios
+    2.引入axios
+        1).全局引入axios
+            1)) 在入口处文件(main.js)引入axios并原型化axios
+                import axios from 'axios'
+                //Vue.use(axios)  // 注意 这样的用法是有问题的，axios不支持Vue.use()的声明方式
+                Vue.prototype.$ajax = axios
+                // 只是import进来是无法使用 axios 命令的。所以我们将 axios 改写为 Vue 的原型属性。那么在其他组件中就能使用$ajax方法了
+            2)) 在mounted(){}中使用axios
+                  this.$ajax.get('https://easy-mock.com/mock/5d5df6a45cc2542cdb769e39/asd/data')
+                    .then(response => {
+                      this.content = response.data;
+                      console.log('ok')
+                    })
+                    .catch(function (error) {
+                      console.log(error)
+                    }),
+        2).局部引入axios
+            import axios from 'axios'
+            	axios({
+                    method: 'get', //请求方式
+                    url: '请求接口地址'
+                  })
+                  .then(function (res) { //成功请求的回调函数（注意这里应该使用箭头函数，防止this指向发生变化而出错）
+                    console.log(res)
+                  })
+                  .catch(function (error) {  //请求失败的回调函数
+                    console.log(error)
+                  })
+二:client3-axios
+
+    1:添加axios插件   vue add axios
+    2.src/main.js添加下列内容
+        Object.defineProperty(Vue.prototype, '$http', {
+            value: axios
+        })
+    3.根目录新建vue.config.js
+        module.exports = {
+            devServer: {
+                proxy: {//如需跨域请求多个域名，在此对象进行扩展即可
+                    '/apis': {
+                        target: 'http://www.***.com/',//访问数据的计算机域名
+                        ws: true,
+                        changeOrigin: true,
+                        pathRewrite: {
+                            '^/apis': ''
+                        }
+                    },
+                }
+            }
+        }
+    4.（应用实例前重启服务器）vue组件
+        this.$axios.get(' https://easy-mock.com/mock/5d5df6a45cc2542cdb769e39/asd/data',{params:this.searUser})
+                    .then(res => {
+                        console.log(res);
+                    }).catch(err => {
+                        console.log(err);
+                });
